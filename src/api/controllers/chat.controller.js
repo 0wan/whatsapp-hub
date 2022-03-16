@@ -1,5 +1,5 @@
 exports.listAll = async (req, res) => {
-    const data = await WhatsAppInstances[req.query.key].getAllChat(
+    const data = await WhatsAppInstances[req.query.key].getAllChats(
         //
     )
     return res.status(201).json({ error: false, data: data })

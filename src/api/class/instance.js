@@ -11,7 +11,8 @@ const { v4: uuidv4 } = require('uuid')
 const path = require('path')
 const processButton = require('../helper/processbtn')
 const generateVC = require('../helper/genVc')
-// const Chat = require("../models/chat.model")
+const Chat = require("../models/chat.model")
+const Message = require("../repositories/message.repository")
 const axios = require('axios')
 const config = require('../../config/config')
 
@@ -161,7 +162,10 @@ class WhatsAppInstance {
 
             m.messages.map(async (msg) => {
                 if (!msg.message) return
-                if (msg.key.fromMe) return
+                if (msg.key.fromMe) {
+                    await Message.store(this.key,msg)
+                    return
+                }
 
                 const messageType = Object.keys(msg.message)[0]
                 if (
@@ -181,6 +185,11 @@ class WhatsAppInstance {
                 if (messageType === 'conversation') {
                     webhookData['text'] = m
                 }
+                // console.log(msg)
+                // const rec = new Message(msg)
+                // await rec.save()
+                await Message.store(this.key,msg)
+
                 this.SendWebhook(webhookData)
             })
         })
@@ -335,6 +344,11 @@ class WhatsAppInstance {
         const group = this.instance.chats.find((c) => c.id === id)
         if (!group) throw new Error('no group exists')
         return await this.instance.sock?.groupLeave(id)
+    }
+
+    async getAllChats() {
+        // let AllChat = await Chat.findOne({key: key}).exec();
+        return this.instance.chats //.filter((c) => c.id.includes('@c.us'))
     }
 }
 

@@ -1,12 +1,17 @@
 const app = require('./config/express')
-// const mongoose = require('mongoose')
+const mongoose = require('mongoose')
 const config = require('./config/config')
 const logger = require('pino')()
 let server
-
+let db
 // mongoose.connect(config.mongoose.url, config.mongoose.options).then(() => {
 //     logger.info('Connected to MongoDB')
 // })
+
+mongoose.connect(config.mongoose.url, config.mongoose.options)
+db = mongoose.connection
+db.on('error', (err) => unexpectedErrorHandler(err))
+db.once('open', () => logger.info(`Database Connected`))
 
 server = app.listen(config.port, () => {
     logger.info(`Listening to port ${config.port}`)
