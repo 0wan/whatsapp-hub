@@ -4,12 +4,15 @@ const instanceRoutes = require('./instance.route')
 const messageRoutes = require('./message.route')
 const miscRoutes = require('./misc.route')
 const groupRoutes = require('./group.route')
+const chatRoutes = require('./chat.route')
 
+router.get('/', (req, res) => res.render('app'))
 router.get('/status', (req, res) => res.send('OK'))
 
 router.use('/instance', instanceRoutes)
 router.use('/message', messageRoutes)
 router.use('/group', groupRoutes)
 router.use('/misc', miscRoutes)
+router.use('/chat', chatRoutes)
 
 module.exports = router
