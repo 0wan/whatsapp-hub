@@ -2,6 +2,7 @@ const app = require('./config/express')
 const mongoose = require('mongoose')
 const config = require('./config/config')
 const logger = require('pino')()
+const sess = require('./api/repositories/instance.repository')
 let server
 let db
 // mongoose.connect(config.mongoose.url, config.mongoose.options).then(() => {
@@ -15,6 +16,8 @@ db.once('open', () => logger.info(`Database Connected`))
 
 server = app.listen(config.port, () => {
     logger.info(`Listening to port ${config.port}`)
+    logger.info(`Trying to restore sessions`)
+    sess.restoreFs().catch(e => logger.error(e))
 })
 const exitHandler = () => {
     if (server) {

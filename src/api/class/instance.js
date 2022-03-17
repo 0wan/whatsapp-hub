@@ -11,7 +11,7 @@ const { v4: uuidv4 } = require('uuid')
 const path = require('path')
 const processButton = require('../helper/processbtn')
 const generateVC = require('../helper/genVc')
-const Chat = require("../models/chat.model")
+const Chat = require("../repositories/chat.repository")
 const Message = require("../repositories/message.repository")
 const axios = require('axios')
 const config = require('../../config/config')
@@ -104,7 +104,8 @@ class WhatsAppInstance {
         // on receive all chats
         sock?.ev.on('chats.set', async ({ chats }) => {
             console.log('Received all chat')
-            const recivedChats = chats.map((chat) => {
+            const recivedChats = chats.map(async (chat) => {
+                await Chat.store(this.key, chat)
                 return {
                     ...chat,
                     messages: [],
@@ -119,7 +120,8 @@ class WhatsAppInstance {
         // on recive new chat
         sock?.ev.on('chats.upsert', (newChat) => {
             // console.log("Received new chat")
-            const chats = newChat.map((chat) => {
+            const chats = newChat.map(async (chat) => {
+                await Chat.store(this.key, chat)
                 return {
                     ...chat,
                     messages: [],
@@ -163,6 +165,15 @@ class WhatsAppInstance {
             m.messages.map(async (msg) => {
                 if (!msg.message) return
                 if (msg.key.fromMe) {
+                    const messageType = Object.keys(msg.message)[0]
+                    if (
+                        [
+                            'protocolMessage',
+                            'senderKeyDistributionMessage',
+                        ].includes(messageType)
+                    )
+                        return
+
                     await Message.store(this.key,msg)
                     return
                 }
@@ -185,9 +196,7 @@ class WhatsAppInstance {
                 if (messageType === 'conversation') {
                     webhookData['text'] = m
                 }
-                // console.log(msg)
-                // const rec = new Message(msg)
-                // await rec.save()
+
                 await Message.store(this.key,msg)
 
                 this.SendWebhook(webhookData)
@@ -206,6 +215,11 @@ class WhatsAppInstance {
     getWhatsAppId(id) {
         if (id.includes('@g.us') || id.includes('@s.whatsapp.net')) return id
         return id.includes('-') ? `${id}@g.us` : `${id}@s.whatsapp.net`
+    }
+
+    isGroup(id) {
+        id = this.getWhatsAppId(id)
+        return id.includes('@g.us')
     }
 
     async verifyId(id) {

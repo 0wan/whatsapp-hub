@@ -1,3 +1,5 @@
+const Message = require("../repositories/message.repository");
+
 exports.Text = async (req, res) => {
     const data = await WhatsAppInstances[req.query.key].sendTextMessage(
         req.query.id,
@@ -85,5 +87,10 @@ exports.MediaButton = async (req, res) => {
         req.query.id,
         req.body.btndata
     )
+    return res.status(201).json({ error: false, data: data })
+}
+
+exports.listById = async (req, res) => {
+    const data = await Message.findByWhatsAppId(req.query.key, req.query.phone)
     return res.status(201).json({ error: false, data: data })
 }
