@@ -1,15 +1,30 @@
 <!-- Body -->
-<div class="grow px-4 sm:px-6 md:px-5 py-6">
+<div class="grow px-4 sm:px-6 md:px-5 py-6"
+     x-data="{
+     items: [],
+     select(phone) {
+
+     } }"
+     @waselect.window="const that = this; $nextTick(async () => {
+     that.items = []
+     const res = await ( await fetch('/message/find?key=' + window.instanceKey + '&phone=' + encodeURI($event.detail.phone) )).json();
+          if (res && res.data && (res.error != true)) that.items = res.data
+     })"
+>
+    <template x-for="row in items">
     <!-- Chat msg -->
     <div class="flex items-start mb-4 last:mb-0">
         <img class="rounded-full mr-4" src="https://images.unsplash.com/photo-1502685104226-ee32379fefbe?ixlib=rb-1.2.1&amp;ixid=eyJhcHBfaWQiOjEyMDd9&amp;auto=format&amp;fit=facearea&amp;facepad=2&amp;w=256&amp;h=256&amp;q=80" width="40" height="40" alt="User 01" />
         <div>
-            <div class="text-sm bg-white text-gray-800 p-3 rounded-lg rounded-tl-none border border-gray-200 shadow-md mb-1">
-                Can anyone help? I have a question about Acme Professional
+            <div class="text-sm p-3 rounded-lg rounded-tl-none border border-gray-200 shadow-md mb-1"
+                 x-html="row.message.message.conversation || ''"
+                 x-bind:class="row.message.key.fromMe ? 'bg-indigo-500 text-white' : 'bg-white text-gray-800'"
+            >
+
             </div>
-            <div class="flex items-center justify-between">
+            <div class="flex items-center justify-between" x-html="row.message.messageTimestamp || ''">
                 <!-- timestamp -->
-                <div class="text-xs text-gray-500 font-medium">2:40 PM</div>
+                <div class="text-xs text-gray-500 font-medium"></div>
                 <!-- deliver status -->
                 <svg class="w-3 h-3 shrink-0 fill-current text-gray-400" viewBox="0 0 12 12">
                     <path d="M10.28 1.28L3.989 7.575 1.695 5.28A1 1 0 00.28 6.695l3 3a1 1 0 001.414 0l7-7A1 1 0 0010.28 1.28z" />
@@ -20,15 +35,16 @@
                 </svg>
             </div>
         </div>
-    </div>    
+    </div>
+    </template>
     <!-- Date separator -->
-    <div class="flex justify-center">
+    <!--<div class="flex justify-center">
         <div class="inline-flex items-center justify-center text-xs font-medium px-2.5 py-1 bg-white border border-gray-200 rounded-full my-5">
             Tuesday, 20 January
         </div>
-    </div>
+    </div>-->
     <!-- Chat msg -->
-    <div class="flex items-start mb-4 last:mb-0">
+    <!--<div class="flex items-start mb-4 last:mb-0">
         <img class="rounded-full mr-4" src="https://images.unsplash.com/photo-1502685104226-ee32379fefbe?ixlib=rb-1.2.1&amp;ixid=eyJhcHBfaWQiOjEyMDd9&amp;auto=format&amp;fit=facearea&amp;facepad=2&amp;w=256&amp;h=256&amp;q=80" width="40" height="40" alt="User 02" />
         <div>
             <div class="text-sm bg-indigo-500 text-white p-3 rounded-lg rounded-tl-none border border-transparent shadow-md mb-1">
@@ -41,9 +57,9 @@
                 </svg>
             </div>
         </div>
-    </div>
+    </div>-->
     <!-- Chat msg -->
-    <div class="flex items-start mb-4 last:mb-0">
+    <!--<div class="flex items-start mb-4 last:mb-0">
         <img class="rounded-full mr-4" src="https://images.unsplash.com/photo-1502685104226-ee32379fefbe?ixlib=rb-1.2.1&amp;ixid=eyJhcHBfaWQiOjEyMDd9&amp;auto=format&amp;fit=facearea&amp;facepad=2&amp;w=256&amp;h=256&amp;q=80" width="40" height="40" alt="User 01" />
         <div>
             <div class="text-sm bg-white text-gray-800 p-3 rounded-lg rounded-tl-none border border-gray-200 shadow-md mb-1">
@@ -60,5 +76,5 @@
                 </svg>
             </div>
         </div>
-    </div>
+    </div>-->
 </div>

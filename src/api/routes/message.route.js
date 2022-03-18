@@ -21,4 +21,6 @@ router
     .route('/mediabutton')
     .post(keyVerify, loginVerify, controller.MediaButton)
 
+router.route('/find').get(keyVerify, loginVerify, controller.listById)
+
 module.exports = router

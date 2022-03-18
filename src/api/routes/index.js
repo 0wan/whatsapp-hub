@@ -6,7 +6,13 @@ const miscRoutes = require('./misc.route')
 const groupRoutes = require('./group.route')
 const chatRoutes = require('./chat.route')
 
-router.get('/', (req, res) => res.render('app'))
+router.get('/', (req, res) => {
+    let key = ''
+    if (Object.keys(WhatsAppInstances).length) {
+        key = Object.keys(WhatsAppInstances)[0]
+    }
+    res.render('app', { instanceKey : key })
+})
 router.get('/status', (req, res) => res.send('OK'))
 
 router.use('/instance', instanceRoutes)
